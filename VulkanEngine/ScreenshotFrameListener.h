@@ -7,6 +7,11 @@ namespace ve {
 	class ScreenshotFrameListener : public VEEventListener {
 
 	protected:
+		int SCREENSHOTSPERSECOND = 5;
+
+		double timeElapsedSinceScreenshot = 0;
+		uint32_t numScreenshot = 0;	
+
 		virtual void onFrameEnded(veEvent event);
 
 	public:
