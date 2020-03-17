@@ -119,6 +119,9 @@
     <ClInclude Include="VHFunctions.h">
       <Filter>Header Files\VHelper</Filter>
     </ClInclude>
+    <ClInclude Include="ScreenshotFrameListener.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="VEEngine.cpp">
@@ -222,6 +225,9 @@
     </ClCompile>
     <ClCompile Include="VHFunctions.cpp">
       <Filter>Source Files\VHelper</Filter>
+    </ClCompile>
+    <ClCompile Include="ScreenshotFrameListener.cpp">
+      <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
