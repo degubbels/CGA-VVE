@@ -135,6 +135,10 @@ namespace ve {
 		///Register an event listener to interact with the user
 		
 		virtual void registerEventListeners() {
+
+			// Register keyboard event listener for movement
+			registerEventListener(new KeyboardListener("movement"), { veEvent::VE_EVENT_KEYBOARD });
+
 			VEEngine::registerEventListeners();
 
 			registerEventListener(new EventListenerCollision("Collision"), { veEvent::VE_EVENT_FRAME_STARTED });
