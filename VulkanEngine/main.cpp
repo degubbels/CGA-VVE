@@ -174,8 +174,8 @@ namespace ve {
 
 			// Load model
 			VESceneNode* sphere;
-			VECHECKPOINTER(sphere = getSceneManagerPointer()->loadModel("sphere", "media/models/test/sphere", "sphere.obj", 0, pScene));
-			//e4->setTransform(glm::scale(glm::mat4(1.0f), glm::vec3(1000.0f, 1.0f, 1000.0f)));
+			VECHECKPOINTER(sphere = getSceneManagerPointer()->loadModel("sphere", "media/models/test/cat", "12221_Cat_v1_l3.obj", aiProcess_FlipWindingOrder | aiProcess_FlipUVs, pScene));
+			sphere->setTransform(glm::scale(glm::mat4(0.1f), glm::vec3(0.1f, 0.1f, 0.1f)));
 
 			m_irrklangEngine->play2D("media/sounds/ophelia.mp3", true);
 		};
