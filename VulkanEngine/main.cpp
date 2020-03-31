@@ -12,9 +12,11 @@
 
 namespace ve {
 
+	float CAT_Y_OFFSET = 0.5;
+
 
 	uint32_t g_score = 0;				//derzeitiger Punktestand
-	double g_time = 30.0;				//zeit die noch übrig ist
+	double g_time = 1130.0;				//zeit die noch übrig ist
 	bool g_gameLost = false;			//true... das Spiel wurde verloren
 	bool g_restart = false;			//true...das Spiel soll neu gestartet werden
 
@@ -176,10 +178,18 @@ namespace ve {
 			eParent->multiplyTransform(glm::translate(glm::mat4(1.0f), glm::vec3(-10.0f, 1.0f, 10.0f)));
 			eParent->addChild(e1);
 
-			// Load model
-			VESceneNode* sphere;
-			VECHECKPOINTER(sphere = getSceneManagerPointer()->loadModel("sphere", "media/models/test/cat", "12221_Cat_v1_l3.obj", aiProcess_FlipWindingOrder | aiProcess_FlipUVs, pScene));
-			sphere->setTransform(glm::scale(glm::mat4(0.1f), glm::vec3(0.1f, 0.1f, 0.1f)));
+			// Load cat model
+			VESceneNode* cat;
+			VECHECKPOINTER(cat= getSceneManagerPointer()->loadModel("sphere", "media/models/test/cat", "12221_Cat_v1_l3.obj", aiProcess_FlipWindingOrder | aiProcess_FlipUVs, pScene));
+			cat->setTransform(glm::scale(glm::mat4(0.1f), glm::vec3(0.02f, 0.02f, 0.02f)));
+
+			// Rotate 90 deg around x-axis
+			cat->multiplyTransform(glm::rotate( glm::mat4(1.0), -glm::half_pi<float>(), glm::vec3(1.0, 0.0, 0.0) ));
+
+			// Move up to ground level
+			cat->multiplyTransform(glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, CAT_Y_OFFSET, 0.0f)));
+
+
 
 			m_irrklangEngine->play2D("media/sounds/ophelia.mp3", true);
 		};
