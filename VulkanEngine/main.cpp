@@ -172,6 +172,11 @@ namespace ve {
 			eParent->multiplyTransform(glm::translate(glm::mat4(1.0f), glm::vec3(-10.0f, 1.0f, 10.0f)));
 			eParent->addChild(e1);
 
+			// Load model
+			VESceneNode* sphere;
+			VECHECKPOINTER(sphere = getSceneManagerPointer()->loadModel("sphere", "media/models/test/sphere", "sphere.obj", 0, pScene));
+			//e4->setTransform(glm::scale(glm::mat4(1.0f), glm::vec3(1000.0f, 1.0f, 1000.0f)));
+
 			m_irrklangEngine->play2D("media/sounds/ophelia.mp3", true);
 		};
 	};
