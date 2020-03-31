@@ -4,7 +4,7 @@
 namespace ve {
 
 	// Movement speed
-	float speed = 1.2f;
+	float speed = 3.2f;
 	float rotSpeed = 2.0;
 
 
@@ -44,7 +44,7 @@ namespace ve {
 		glm::mat4  rotate = glm::rotate(glm::mat4(1.0), angle, rot3);
 		cat->multiplyTransform(rotate);
 
-		//printf("%d, %d, %d\n", trans.x, trans.y, trans.z);
+		printf("%f, %f, %f\n", trans.x, trans.y, trans.z);
 
 		return false;
 	}

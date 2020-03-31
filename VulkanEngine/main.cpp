@@ -183,12 +183,15 @@ namespace ve {
 			catParent = getSceneManagerPointer()->createSceneNode("catP", pScene, glm::mat4(1.0));
 			VECHECKPOINTER(cat= getSceneManagerPointer()->loadModel("cat", "media/models/test/cat", "12221_Cat_v1_l3.obj", aiProcess_FlipWindingOrder | aiProcess_FlipUVs, catParent));
 			catParent->setTransform(glm::scale(glm::mat4(0.1f), glm::vec3(0.02f, 0.02f, 0.02f)));
+			// Move up to ground level
+			cat->multiplyTransform(glm::translate(glm::mat4(1.0f), glm::vec3(1.0f, 0.0f, 0.0f)));
 
-			// Rotate 90 deg around x-axis
+			// Rotate 90 deg around x-axis and y-axis
 			cat->multiplyTransform(glm::rotate( glm::mat4(1.0), -glm::half_pi<float>(), glm::vec3(1.0, 0.0, 0.0) ));
 
 			// Move up to ground level
-			catParent->multiplyTransform(glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, CAT_Y_OFFSET, 0.0f)));
+			catParent->multiplyTransform(glm::translate(glm::mat4(1.0f), glm::vec3(1.0f, 1.0f - CAT_Y_OFFSET, 0.0f)));
+			catParent->multiplyTransform(glm::rotate(glm::mat4(1.0), glm::half_pi<float>(), glm::vec3(0.0, 1.0, 0.0)));
 
 
 
