@@ -13,6 +13,16 @@
 namespace ve {
 
 	float CAT_Y_OFFSET = 0.5;
+
+	int NUM_CUBES = 30;
+
+	float COURSE_LENGTH = 40.0;
+
+	float CUBES_X_MIN = 2.0;
+	float CUBES_X_MAX = COURSE_LENGTH;
+	float CUBES_Z_MIN = -20.0;
+	float CUBES_Z_MAX = 20.0;
+
 	double g_initialTime = 30.0;
 
 	uint32_t g_score = 0;				//derzeitiger Punktestand
@@ -102,7 +112,7 @@ namespace ve {
 				g_restart = false;
 				g_time = g_initialTime;
 				g_score = 0;
-				getSceneManagerPointer()->getSceneNode("The Cube Parent")->setPosition(glm::vec3(d(e), 1.0f, d(e)));
+				//getSceneManagerPointer()->getSceneNode("The Cube Parent")->setPosition(glm::vec3(d(e), 1.0f, d(e)));
 				getEnginePointer()->m_irrklangEngine->play2D("media/sounds/ophelia.mp3", true);
 				return;
 			}
@@ -121,6 +131,7 @@ namespace ve {
 
 			printf("dist: %f\n", finishDistance);
 
+			// Player won, End game
 			if (finishDistance < 5.0f) {
 				g_gameWon = true;
 				printf("won\n");
@@ -130,6 +141,17 @@ namespace ve {
 				getEnginePointer()->m_irrklangEngine->play2D("media/sounds/bell.wav", false);
 			}
 
+			for (int i = 0; i < NUM_CUBES; i++) {
+				glm::vec3 cubePos = getSceneManagerPointer()->getSceneNode("cube-" + i)->getPosition();
+				float cubeDistance = glm::length(cubePos - catPos);
+
+				if (cubeDistance < 1.0f) {
+					// Player lost, End game
+					g_gameLost = true;
+					getEnginePointer()->m_irrklangEngine->removeAllSoundSources();
+					getEnginePointer()->m_irrklangEngine->play2D("media/sounds/gameover.wav", false);
+				}
+			}
 			//float distance = glm::length(positionCube - positionCamera);
 			//if (distance < 1) {
 			//	g_score++;
@@ -147,16 +169,7 @@ namespace ve {
 			//}
 
 			g_time -= event.dt;
-
-			// Player won, End game
-			if (catPos.x > 20.0f) {
-				g_gameWon = true;
-
-				g_score = 100 * (g_initialTime - g_time);
-
-				getEnginePointer()->m_irrklangEngine->removeAllSoundSources();
-				getEnginePointer()->m_irrklangEngine->play2D("media/sounds/bell.wav", false);
-			}
+					
 
 			// Player lost, End game
 			if (g_time <= 0) {
@@ -222,11 +235,11 @@ namespace ve {
 			VECHECKPOINTER( pE4 = (VEEntity*)getSceneManagerPointer()->getSceneNode("The Plane/plane_t_n_s.obj/plane/Entity_0") );
 			pE4->setParam( glm::vec4(1000.0f, 1000.0f, 0.0f, 0.0f) );
 
-			/*VESceneNode *e1,*eParent;
+			VESceneNode *e1,*eParent;
 			eParent = getSceneManagerPointer()->createSceneNode("The Cube Parent", pScene, glm::mat4(1.0));
-			VECHECKPOINTER(e1 = getSceneManagerPointer()->loadModel("The Cube0", "media/models/test/crate0", "cube.obj"));
-			eParent->multiplyTransform(glm::translate(glm::mat4(1.0f), glm::vec3(-10.0f, 1.0f, 10.0f)));
-			eParent->addChild(e1);*/
+
+			spawnCubes(eParent, NUM_CUBES, CUBES_X_MIN, CUBES_X_MAX, CUBES_Z_MIN, CUBES_Z_MAX);
+			
 
 			// Load cat model
 			// Position should only be changed for the catParent ("catP")
@@ -235,13 +248,13 @@ namespace ve {
 			VECHECKPOINTER(cat= getSceneManagerPointer()->loadModel("cat", "media/models/test/cat", "12221_Cat_v1_l3.obj", aiProcess_FlipWindingOrder | aiProcess_FlipUVs, catParent));
 			cat->setTransform(glm::scale(glm::mat4(0.1f), glm::vec3(0.02f, 0.02f, 0.02f)));
 			// Move up to ground level
-			cat->multiplyTransform(glm::translate(glm::mat4(1.0f), glm::vec3(1.0f, 0.0f, 0.0f)));
+			cat->multiplyTransform(glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 0.0f, 0.0f)));
 
 			// Rotate 90 deg around x-axis and y-axis
 			cat->multiplyTransform(glm::rotate( glm::mat4(1.0), -glm::half_pi<float>(), glm::vec3(1.0, 0.0, 0.0) ));
 
 			// Move up to ground level
-			catParent->multiplyTransform(glm::translate(glm::mat4(1.0f), glm::vec3(1.0f, 1.0f - CAT_Y_OFFSET, 0.0f)));
+			catParent->multiplyTransform(glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 1.0f - CAT_Y_OFFSET, 0.0f)));
 			catParent->multiplyTransform(glm::rotate(glm::mat4(1.0), glm::half_pi<float>(), glm::vec3(0.0, 1.0, 0.0)));
 
 			
@@ -249,12 +262,27 @@ namespace ve {
 			VESceneNode* finish;
 			VECHECKPOINTER(finish = getSceneManagerPointer()->loadModel("finish", "media/models/test/crate0", "cube.obj", 0, pScene));
 			finish->setTransform(glm::scale(glm::mat4(1.0), glm::vec3(10.0, 10.0, 10.0)));
-			finish->multiplyTransform(glm::translate(glm::mat4(1.0f), glm::vec3(20.0f, 1.0f, 0.0f)));
+			finish->multiplyTransform(glm::translate(glm::mat4(1.0f), glm::vec3(40.0f, 1.0f, 0.0f)));
 			
 
 
 			m_irrklangEngine->play2D("media/sounds/ophelia.mp3", true);
 		};
+
+		// spawn num cubes with the given bounds
+		void spawnCubes(VESceneNode* parent, int num, float x_min, float x_max, float z_min, float z_max) {
+
+			for (int i = 0; i < num; i++) {
+				VESceneNode *cube;
+
+				VECHECKPOINTER(cube = getSceneManagerPointer()->loadModel("cube-"+i, "media/models/test/crate0", "cube.obj", 0, parent));
+
+				float xpos = (rand() % (int)(x_max - x_min)) + x_min;
+				float zpos = (rand() % (int)(z_max - z_min)) + z_min;
+
+				cube->multiplyTransform(glm::translate(glm::mat4(1.0f), glm::vec3(xpos, 1.0f, zpos)));
+			}
+		}
 	};
 
 

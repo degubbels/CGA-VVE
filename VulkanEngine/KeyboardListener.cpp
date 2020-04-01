@@ -4,7 +4,7 @@
 namespace ve {
 
 	// Movement speed
-	float speed = 20.0f;
+	float speed = 80.0f;
 	float rotSpeed = 2.0;
 
 
@@ -22,7 +22,7 @@ namespace ve {
 
 		switch (event.idata1) {
 		case GLFW_KEY_W:
-			translate = cat->getTransform() * glm::vec4(0.0, 0.0, 1.0, 1.0); //forward
+			translate = glm::translate(cat->getTransform(), glm::vec3(10.0f, 0.0f, 0.0f)) * glm::vec4(0.0, 0.0, 1.0, 1.0); //forward
 			translate.y = 0.0f;
 			break;
 		case GLFW_KEY_A:
