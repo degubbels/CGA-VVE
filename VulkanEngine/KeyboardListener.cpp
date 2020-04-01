@@ -4,7 +4,7 @@
 namespace ve {
 
 	// Movement speed
-	float speed = 80.0f;
+	float speed = 160.0f;
 	float rotSpeed = 2.0;
 
 

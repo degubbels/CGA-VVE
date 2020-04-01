@@ -14,14 +14,14 @@ namespace ve {
 
 	float CAT_Y_OFFSET = 0.5;
 
-	int NUM_CUBES = 30;
+	int NUM_CUBES = 60;
 
-	float COURSE_LENGTH = 40.0;
+	float COURSE_LENGTH = 60.0;
 
 	float CUBES_X_MIN = 2.0;
 	float CUBES_X_MAX = COURSE_LENGTH;
-	float CUBES_Z_MIN = -20.0;
-	float CUBES_Z_MAX = 20.0;
+	float CUBES_Z_MIN = -12.0;
+	float CUBES_Z_MAX = 12.0;
 
 	double g_initialTime = 30.0;
 
@@ -45,9 +45,28 @@ namespace ve {
 			struct nk_context * ctx = pSubrender->getContext();
 
 			if (!g_gameLost && !g_gameWon) {
-				if (nk_begin(ctx, "", nk_rect(0, 0, 200, 170), NK_WINDOW_BORDER )) {
+				if (nk_begin(ctx, "", nk_rect(0, 0, 400, 300), NK_WINDOW_BORDER )) {
 					char outbuffer[100];
 
+					nk_layout_row_dynamic(ctx, 45, 1);
+					sprintf(outbuffer, "Get to the big cube ASAP");
+					nk_label(ctx, outbuffer, NK_TEXT_LEFT);
+
+					nk_layout_row_dynamic(ctx, 45, 1);
+					sprintf(outbuffer, "Avoid the small cubes");
+					nk_label(ctx, outbuffer, NK_TEXT_LEFT);
+
+					nk_layout_row_dynamic(ctx, 45, 1);
+					sprintf(outbuffer, "Move forward with [W]");
+					nk_label(ctx, outbuffer, NK_TEXT_LEFT);
+
+					nk_layout_row_dynamic(ctx, 45, 1);
+					sprintf(outbuffer, "Turn with[A], [D]");
+					nk_label(ctx, outbuffer, NK_TEXT_LEFT);
+
+					nk_layout_row_dynamic(ctx, 45, 1);
+					sprintf(outbuffer, "Move camera with [I][J][k][L]");
+					nk_label(ctx, outbuffer, NK_TEXT_LEFT);					
 
 					nk_layout_row_dynamic(ctx, 45, 1);
 					sprintf(outbuffer, "Time: %004.1lf", g_time);
@@ -112,7 +131,10 @@ namespace ve {
 				g_restart = false;
 				g_time = g_initialTime;
 				g_score = 0;
-				//getSceneManagerPointer()->getSceneNode("The Cube Parent")->setPosition(glm::vec3(d(e), 1.0f, d(e)));
+				getSceneManagerPointer()->getSceneNode("catP")->setPosition(glm::vec3(0, 1.0f-CAT_Y_OFFSET, 0));
+
+				VESceneNode* pCameraParent = getSceneManagerPointer()->getCamera()->getParent();
+				pCameraParent->setPosition(glm::vec3(-10.0f, 10.0f, 0.0f));
 				getEnginePointer()->m_irrklangEngine->play2D("media/sounds/ophelia.mp3", true);
 				return;
 			}
@@ -125,17 +147,13 @@ namespace ve {
 			glm::vec3 positionFinish   = getSceneManagerPointer()->getSceneNode("finish")->getPosition();
 			glm::vec3 positionCamera = getSceneManagerPointer()->getSceneNode("StandardCameraParent")->getPosition();
 
-			
-
 			float finishDistance = glm::length(positionFinish - catPos);
-
-			printf("dist: %f\n", finishDistance);
 
 			// Player won, End game
 			if (finishDistance < 5.0f) {
 				g_gameWon = true;
 				printf("won\n");
-				g_score = 100 * (g_initialTime - g_time);
+				g_score = 100 * g_time;
 
 				getEnginePointer()->m_irrklangEngine->removeAllSoundSources();
 				getEnginePointer()->m_irrklangEngine->play2D("media/sounds/bell.wav", false);
@@ -152,21 +170,6 @@ namespace ve {
 					getEnginePointer()->m_irrklangEngine->play2D("media/sounds/gameover.wav", false);
 				}
 			}
-			//float distance = glm::length(positionCube - positionCamera);
-			//if (distance < 1) {
-			//	g_score++;
-			//	getEnginePointer()->m_irrklangEngine->play2D("media/sounds/explosion.wav", false);
-			//	if (g_score % 10 == 0) {
-			//		g_time = 30;
-			//		getEnginePointer()->m_irrklangEngine->play2D("media/sounds/bell.wav", false);
-			//	}
-
-			//	VESceneNode *eParent = getSceneManagerPointer()->getSceneNode("The Cube Parent");
-			//	eParent->setPosition(glm::vec3(d(e), 1.0f, d(e)));
-
-			//	getSceneManagerPointer()->deleteSceneNodeAndChildren("The Cube"+ std::to_string(cubeid));
-			//	VECHECKPOINTER(getSceneManagerPointer()->loadModel("The Cube"+ std::to_string(++cubeid)  , "media/models/test/crate0", "cube.obj", 0, eParent) );
-			//}
 
 			g_time -= event.dt;
 					
@@ -217,6 +220,13 @@ namespace ve {
 
 			VEEngine::loadLevel(numLevel );			//create standard cameras and lights
 
+			// Move camera up
+			VESceneNode* pCamera = getSceneManagerPointer()->getCamera();
+			VESceneNode* pCameraParent = pCamera->getParent();
+			pCameraParent->multiplyTransform(glm::translate(glm::mat4(1.0f), glm::vec3(-10.0f, 10.0f, 0.0f)));
+			pCamera->multiplyTransform(glm::rotate(glm::mat4(1.0), glm::half_pi<float>(), glm::vec3(0.0, 1.0, 0.0)));
+			pCamera->multiplyTransform(glm::rotate(glm::mat4(1.0), -glm::pi<float>() / 6, glm::vec3(0.0, 0.0, 1.0)));
+
 			VESceneNode *pScene;
 			VECHECKPOINTER( pScene = getSceneManagerPointer()->createSceneNode("Level 1", getRoot()) );
 	
@@ -247,8 +257,6 @@ namespace ve {
 			catParent = getSceneManagerPointer()->createSceneNode("catP", pScene, glm::mat4(1.0));
 			VECHECKPOINTER(cat= getSceneManagerPointer()->loadModel("cat", "media/models/test/cat", "12221_Cat_v1_l3.obj", aiProcess_FlipWindingOrder | aiProcess_FlipUVs, catParent));
 			cat->setTransform(glm::scale(glm::mat4(0.1f), glm::vec3(0.02f, 0.02f, 0.02f)));
-			// Move up to ground level
-			cat->multiplyTransform(glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 0.0f, 0.0f)));
 
 			// Rotate 90 deg around x-axis and y-axis
 			cat->multiplyTransform(glm::rotate( glm::mat4(1.0), -glm::half_pi<float>(), glm::vec3(1.0, 0.0, 0.0) ));
@@ -262,7 +270,7 @@ namespace ve {
 			VESceneNode* finish;
 			VECHECKPOINTER(finish = getSceneManagerPointer()->loadModel("finish", "media/models/test/crate0", "cube.obj", 0, pScene));
 			finish->setTransform(glm::scale(glm::mat4(1.0), glm::vec3(10.0, 10.0, 10.0)));
-			finish->multiplyTransform(glm::translate(glm::mat4(1.0f), glm::vec3(40.0f, 1.0f, 0.0f)));
+			finish->multiplyTransform(glm::translate(glm::mat4(1.0f), glm::vec3(COURSE_LENGTH, 1.0f, 0.0f)));
 			
 
 
