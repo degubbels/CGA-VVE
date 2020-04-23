@@ -119,10 +119,10 @@
     <ClInclude Include="VHFunctions.h">
       <Filter>Header Files\VHelper</Filter>
     </ClInclude>
-    <ClInclude Include="ScreenshotFrameListener.h">
+    <ClInclude Include="KeyboardListener.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="KeyboardListener.h">
+    <ClInclude Include="CaptureFrameListener.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
@@ -229,10 +229,10 @@
     <ClCompile Include="VHFunctions.cpp">
       <Filter>Source Files\VHelper</Filter>
     </ClCompile>
-    <ClCompile Include="ScreenshotFrameListener.cpp">
+    <ClCompile Include="KeyboardListener.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="KeyboardListener.cpp">
+    <ClCompile Include="CaptureFrameListener.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

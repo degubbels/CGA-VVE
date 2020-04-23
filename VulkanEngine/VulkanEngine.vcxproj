@@ -174,7 +174,7 @@
     <ClInclude Include="..\external\threadpool\ThreadPool.h" />
     <ClInclude Include="CLInclude.h" />
     <ClInclude Include="CLShape.h" />
-    <ClInclude Include="ScreenshotFrameListener.h" />
+    <ClInclude Include="CaptureFrameListener.h" />
     <ClInclude Include="KeyboardListener.h" />
     <ClInclude Include="VEEventListenerNuklear.h" />
     <ClInclude Include="VEEventListenerNuklearDebug.h" />
@@ -207,7 +207,7 @@
     <ClCompile Include="KeyboardListener.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="CLIntersect.cpp" />
-    <ClCompile Include="ScreenshotFrameListener.cpp" />
+    <ClCompile Include="CaptureFrameListener.cpp" />
     <ClCompile Include="VHFunctions.cpp" />
     <ClCompile Include="VEDocumentation.cpp" />
     <ClCompile Include="VEEngine.cpp" />

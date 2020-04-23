@@ -33,7 +33,7 @@
 #include "VERenderer.h"
 #include "VERendererForward.h"
 
-#include "ScreenshotFrameListener.h"
+#include "CaptureFrameListener.h"
 
 #include "KeyboardListener.h"
 
