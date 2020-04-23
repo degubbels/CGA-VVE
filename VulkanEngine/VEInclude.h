@@ -33,6 +33,8 @@
 #include "VERenderer.h"
 #include "VERendererForward.h"
 
+#include "ScreenshotFrameListener.h"
+
 #include "KeyboardListener.h"
 
 

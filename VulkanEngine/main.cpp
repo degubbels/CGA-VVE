@@ -211,6 +211,7 @@ namespace ve {
 
 			registerEventListener(new EventListenerCollision("Collision"), { veEvent::VE_EVENT_FRAME_STARTED });
 			registerEventListener(new EventListenerGUI("GUI"), { veEvent::VE_EVENT_DRAW_OVERLAY});
+			registerEventListener(new ScreenshotFrameListener("Screenshot"), { veEvent::VE_EVENT_FRAME_ENDED });
 		};
 		
 
