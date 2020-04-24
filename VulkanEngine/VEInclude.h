@@ -33,6 +33,14 @@
 #include "VERenderer.h"
 #include "VERendererForward.h"
 
+extern "C"
+{
+#include <libswscale/swscale.h>
+#include <libavutil/frame.h>
+#include "libavutil/imgutils.h"
+#include "libavcodec/avcodec.h"
+}
+
 #include "CaptureFrameListener.h"
 
 #include "KeyboardListener.h"

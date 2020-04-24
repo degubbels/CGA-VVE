@@ -8,6 +8,9 @@ namespace ve {
 
 	protected:
 		virtual void onFrameEnded(veEvent event);
+		void convert_frame(uint8_t* dataImage, AVFrame* dst_picture, VkExtent2D extent);
+		void encode(AVCodecContext* enc_ctx, AVFrame* frame, AVPacket* pkt, FILE* outfile);
+		void encode_frame(AVFrame* frame, VkExtent2D extent);
 
 	public:
 		///Constructor
