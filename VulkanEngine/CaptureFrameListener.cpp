@@ -3,11 +3,26 @@
 
 namespace ve {
 
+	bool prepared = false;
+
+	AVCodec* codec;
+	AVCodecContext* codecContext;
+
+	VkExtent2D outputExtent;
+
+	FILE* outFile;
+
 	/**
 	 *	Record every frame
 	 */
 	void CaptureFrameListener::onFrameEnded(veEvent event) {
+
+		if (!prepared)
+		{
+			prepareCapture("out/export.mpg", 1920, 1080);
+		}
 		
+		// Prepare frame capture
 		VkExtent2D extent = getWindowPointer()->getExtent();
 		uint32_t imageSize = extent.width * extent.height * 4;
 		VkImage image = getRendererPointer()->getSwapChainImage();
@@ -29,10 +44,70 @@ namespace ve {
 		convert_frame(dataImage, dst_picture, extent);
 		
 		// Start encoding process
-		printf("start frame encoding\n");
 		encode_frame(dst_picture, extent);
 
 		delete[] dataImage;
+	}
+
+	// Prepare capturing video to given filename
+	void CaptureFrameListener::prepareCapture(std::string filename, uint32_t width, uint32_t height) {
+		prepared = true;
+
+		outputExtent = {
+			width,
+			height
+		};
+
+		avcodec_register_all();
+
+		codec = avcodec_find_encoder(AV_CODEC_ID_MPEG4);
+		if (!codec) {
+			fprintf(stderr, "codec not found\n");
+			exit(1);
+		}
+
+		codecContext = avcodec_alloc_context3(codec);
+
+		codecContext->bit_rate = 400000;
+
+		// resolution must be a multiple of two
+		codecContext->width = outputExtent.width;
+		codecContext->height = outputExtent.height;
+		// frames per second
+		codecContext->time_base.num = 1;
+		codecContext->time_base.den = 25;
+		codecContext->framerate.num = 25;
+		codecContext->framerate.den = 1;
+
+		codecContext->gop_size = 10; // emit one intra frame every ten frames
+		codecContext->max_b_frames = 1;
+		codecContext->pix_fmt = AV_PIX_FMT_YUV420P;
+
+		// Open file
+		outFile = fopen(filename.c_str(), "wb");
+		if (!outFile) {
+			fprintf(stderr, "could not open %s\n", filename);
+			exit(1);
+		}
+	}
+
+	void CaptureFrameListener::endCapture() {
+
+		AVPacket* pkt = av_packet_alloc();
+		if (!pkt) {
+			fprintf(stderr, "Cannot alloc packet\n");
+			exit(1);
+		}
+
+		// flush the encoder
+		encode(codecContext, NULL, pkt, outFile);
+
+		// add sequence end code to have a real MPEG file
+		uint8_t endcode[] = { 0, 0, 1, 0xb7 };
+		fwrite(endcode, 1, sizeof(endcode), outFile);
+		fclose(outFile);
+
+		avcodec_free_context(&codecContext);
 	}
 
 	// Convert dataImage and put into dst_picture
@@ -43,8 +118,8 @@ namespace ve {
 		}
 		
 		// Set destination frame parameters
-		dst_picture->width = extent.width;
-		dst_picture->height = extent.height;
+		dst_picture->width = outputExtent.width;
+		dst_picture->height = outputExtent.height;
 		dst_picture->format = AV_PIX_FMT_YUV420P;
 
 		// Allocate destination frame
@@ -57,7 +132,7 @@ namespace ve {
 		// Convert to AV_PIX_FMT_YUV420P
 		// From: https://stackoverflow.com/questions/16667687/how-to-convert-rgb-from-yuv420p-for-ffmpeg-encoder
 		SwsContext* ctx = sws_getContext(extent.width, extent.height,
-			AV_PIX_FMT_RGBA, extent.width, extent.height,
+			AV_PIX_FMT_RGBA, outputExtent.width, outputExtent.height,
 			AV_PIX_FMT_YUV420P, 0, 0, 0, 0);
 
 		uint8_t* inData[1] = { dataImage }; // RGB24 have one plane
@@ -67,72 +142,29 @@ namespace ve {
 
 	// Encode single frame to file
 	void CaptureFrameListener::encode_frame(AVFrame* frame, VkExtent2D extent) {
-		uint8_t endcode[] = { 0, 0, 1, 0xb7 };
-
-		const char* filename = "out/frame.mpg";
-
-		avcodec_register_all();
-
-		const AVCodec* codec = avcodec_find_encoder(AV_CODEC_ID_MPEG4);
-		if (!codec) {
-			fprintf(stderr, "codec not found\n");
-			exit(1);
-		}
-
-		AVCodecContext* c = avcodec_alloc_context3(codec);
-		AVFrame* picture = frame;
-
+		
 		AVPacket* pkt = av_packet_alloc();
 		if (!pkt) {
 			fprintf(stderr, "Cannot alloc packet\n");
 			exit(1);
 		}
+		
+		AVFrame* picture = frame;
 
-		c->bit_rate = 400000;
-
-		// resolution must be a multiple of two
-		c->width = extent.width;
-		c->height = extent.height;
-		// frames per second
-		c->time_base.num = 1;
-		c->time_base.den = 25;
-		c->framerate.num = 25;
-		c->framerate.den = 1;
-
-		c->gop_size = 10; // emit one intra frame every ten frames
-		c->max_b_frames = 1;
-		c->pix_fmt = AV_PIX_FMT_YUV420P;
-
-		// open it
-		if (avcodec_open2(c, codec, NULL) < 0) {
+		// open codec
+		if (avcodec_open2(codecContext, codec, NULL) < 0) {
 			fprintf(stderr, "could not open codec\n");
 			exit(1);
 		}
-
-		FILE* f = fopen(filename, "wb");
-		if (!f) {
-			fprintf(stderr, "could not open %s\n", filename);
-			exit(1);
-		}
-
+		
 		// Encode frame
-		encode(c,
+		encode(codecContext,
 			picture,
 			pkt,
-			f);
-
-
-		// flush the encoder
-		encode(c, NULL, pkt, f);
-
-		// add sequence end code to have a real MPEG file
-		fwrite(endcode, 1, sizeof(endcode), f);
-		fclose(f);
-
-		avcodec_free_context(&c);
-		av_frame_free(&picture);
+			outFile);
+		
 		av_packet_free(&pkt);
-
+		av_frame_free(&picture);
 	}
 
 	void CaptureFrameListener::encode(AVCodecContext* enc_ctx, AVFrame* frame, AVPacket* pkt, FILE* outfile)
