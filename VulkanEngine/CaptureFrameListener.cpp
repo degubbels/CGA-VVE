@@ -12,19 +12,35 @@ namespace ve {
 
 	FILE* outFile;
 
+	int frames_since_last_capture = 0;
+	const int frames_between_captures = 3;
+
+	const AVCodecID CODEC_ID = AV_CODEC_ID_VP9;
+	const uint32_t BITRATE = 300'000;
+	const std::string name = "VP9_300";
+
 	/**
 	 *	Record every frame
 	 */
 	void CaptureFrameListener::onFrameEnded(veEvent event) {
 
-		if (!prepared)
+		if (frames_since_last_capture < frames_between_captures)
 		{
-			prepareCapture("out/export.mpg", 1920, 1080);
+			// Skip frame
+			frames_since_last_capture++;
+			return;
 		}
-		
+
 		// Prepare frame capture
 		VkExtent2D extent = getWindowPointer()->getExtent();
 		uint32_t imageSize = extent.width * extent.height * 4;
+
+		if (!prepared)
+		{
+			prepareCapture("out/"+name+".mpg", extent.width, extent.height);
+		}
+		
+
 		VkImage image = getRendererPointer()->getSwapChainImage();
 
 		uint8_t* dataImage = new uint8_t[imageSize];
@@ -68,16 +84,16 @@ namespace ve {
 
 		codecContext = avcodec_alloc_context3(codec);
 
-		codecContext->bit_rate = 400000;
+		codecContext->bit_rate = BITRATE;
 
 		// resolution must be a multiple of two
 		codecContext->width = outputExtent.width;
 		codecContext->height = outputExtent.height;
 		// frames per second
-		codecContext->time_base.num = 1;
-		codecContext->time_base.den = 25;
-		codecContext->framerate.num = 25;
-		codecContext->framerate.den = 1;
+		codecContext->time_base.num = frames_between_captures+1;
+		codecContext->time_base.den = 30;
+		codecContext->framerate.num = 30;
+		codecContext->framerate.den = frames_between_captures+1;
 
 		codecContext->gop_size = 10; // emit one intra frame every ten frames
 		codecContext->max_b_frames = 1;

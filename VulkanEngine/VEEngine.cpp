@@ -45,7 +45,7 @@ namespace ve {
 		createRenderer();					//create a renderer
 		createSceneManager();				//create a scene manager
 		createWindow();						//create a window
-		m_pWindow->initWindow(800, 600);	//inittialize the window
+		m_pWindow->initWindow(1280, 720);	//inittialize the window
 
 		m_threadPool = new ThreadPool(0); //worker threads
 
