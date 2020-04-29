@@ -32,6 +32,8 @@ namespace ve {
 	bool g_gameLost = false;			//true... das Spiel wurde verloren
 	bool g_restart = false;				//true...das Spiel soll neu gestartet werden
 
+	CaptureFrameListener* captureFrameListener;
+
 	//
 	//Zeichne das GUI
 	//
@@ -211,6 +213,7 @@ namespace ve {
 
 			registerEventListener(new EventListenerCollision("Collision"), { veEvent::VE_EVENT_FRAME_STARTED });
 			registerEventListener(new EventListenerGUI("GUI"), { veEvent::VE_EVENT_DRAW_OVERLAY});
+			registerEventListener(captureFrameListener, { veEvent::VE_EVENT_FRAME_ENDED });
 		};
 		
 
@@ -304,9 +307,15 @@ int main() {
 
 	MyVulkanEngine mve(debug);	//enable or disable debugging (=callback, validation layers)
 
+	captureFrameListener = new CaptureFrameListener("captureListener");
+	//captureFrameListener->prepareCapture("out/capture.mpg", 1920, 1080);
+
 	mve.initEngine();
 	mve.loadLevel(1);
 	mve.run();
+
+	// Close video capture
+	captureFrameListener->endCapture();
 
 	return 0;
 }

@@ -122,6 +122,9 @@
     <ClInclude Include="KeyboardListener.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="CaptureFrameListener.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="VEEngine.cpp">
@@ -227,6 +230,9 @@
       <Filter>Source Files\VHelper</Filter>
     </ClCompile>
     <ClCompile Include="KeyboardListener.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="CaptureFrameListener.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

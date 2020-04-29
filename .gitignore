@@ -10,4 +10,5 @@ renderdoc.cap
 */CMakeFiles/
 */cmake_install.cmake
 */Makefile
-/VulkanEngine/media/screenshots
+/VulkanEngine/media/screenshots/
+/VulkanEngine/out/

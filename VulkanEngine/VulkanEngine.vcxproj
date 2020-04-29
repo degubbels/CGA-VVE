@@ -80,8 +80,8 @@
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <LinkIncremental>false</LinkIncremental>
-    <IncludePath>$(Vulkan_SDK)\Include;$(SolutionDir)\external\glm;$(SolutionDir)\external\stb;$(SolutionDir)\external\glfw\glfw-3.2.1.bin.WIN64\include;$(SolutionDir)\external\Assimp\include;$(SolutionDir)\external\gli-master;$(SolutionDir)\external\nuklear;$(SolutionDir)\external\threadpool;$(SolutionDir)\external\irrKlang\include;$(IncludePath)</IncludePath>
-    <LibraryPath>$(SolutionDir)\external\glfw\glfw-3.2.1.bin.WIN64\lib-vc2015;$(Vulkan_SDK)\Lib;$(SolutionDir)\external\Assimp\lib\x64\Debug;$(LibraryPath);$(SolutionDir)\external\irrKlang\lib</LibraryPath>
+    <IncludePath>D:\dev\uni\CGA\ffmpeg\ffmpeg-4.1.1-win64-dev\include;$(Vulkan_SDK)\Include;$(SolutionDir)\external\glm;$(SolutionDir)\external\stb;$(SolutionDir)\external\glfw\glfw-3.2.1.bin.WIN64\include;$(SolutionDir)\external\Assimp\include;$(SolutionDir)\external\gli-master;$(SolutionDir)\external\nuklear;$(SolutionDir)\external\threadpool;$(SolutionDir)\external\irrKlang\include;$(IncludePath)</IncludePath>
+    <LibraryPath>D:\dev\uni\CGA\ffmpeg\ffmpeg-4.1.1-win64-dev\lib;$(SolutionDir)\external\glfw\glfw-3.2.1.bin.WIN64\lib-vc2015;$(Vulkan_SDK)\Lib;$(SolutionDir)\external\Assimp\lib\x64\Debug;$(LibraryPath);$(SolutionDir)\external\irrKlang\lib</LibraryPath>
     <OutDir>$(SolutionDir)\bin\$(Platform)\$(Configuration)\</OutDir>
     <IntDir>$(SolutionDir)\bin\$(Platform)\$(Configuration)\</IntDir>
     <ExecutablePath>$(ExecutablePath)</ExecutablePath>
@@ -129,7 +129,7 @@
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>irrKlang.lib;glfw3.lib;assimp-vc140-mt.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>irrKlang.lib;glfw3.lib;assimp-vc140-mt.lib;avcodec.lib;avutil.lib;swscale.lib;swresample.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -174,6 +174,7 @@
     <ClInclude Include="..\external\threadpool\ThreadPool.h" />
     <ClInclude Include="CLInclude.h" />
     <ClInclude Include="CLShape.h" />
+    <ClInclude Include="CaptureFrameListener.h" />
     <ClInclude Include="KeyboardListener.h" />
     <ClInclude Include="VEEventListenerNuklear.h" />
     <ClInclude Include="VEEventListenerNuklearDebug.h" />
@@ -206,6 +207,7 @@
     <ClCompile Include="KeyboardListener.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="CLIntersect.cpp" />
+    <ClCompile Include="CaptureFrameListener.cpp" />
     <ClCompile Include="VHFunctions.cpp" />
     <ClCompile Include="VEDocumentation.cpp" />
     <ClCompile Include="VEEngine.cpp" />

@@ -26,8 +26,6 @@ add_executable(game
         VESubrender.cpp
         VESubrenderFW_C1.h
         VESubrenderFW_C1.cpp
-        VESubrenderFW_Cubemap.h
-        VESubrenderFW_Cubemap.cpp
         VESubrenderFW_D.h
         VESubrenderFW_D.cpp
         VESubrenderFW_DN.h
