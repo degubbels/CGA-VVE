@@ -244,12 +244,12 @@ namespace ve {
 		for (size_t i = 0; i < (nfrags-1); i++) {
 			
 			// Send fragment of packet starting at i*packet_size
-			udp_send(frame, i, reinterpret_cast<char*>(&pkt->data[i * PACKET_SIZE]), PACKET_SIZE);
-		}
-		udp_send(frame, nfrags-1, reinterpret_cast<char*>(&pkt->data[(nfrags-1) * PACKET_SIZE]), pkt->size - (nfrags-1)*PACKET_SIZE);
+			udp_send(frame, i, reinterpret_cast<char*>(&pkt->data[i * PACKET_SIZE]), PACKET_SIZE, nfrags);
+		}	
+		udp_send(frame, nfrags-1, reinterpret_cast<char*>(&pkt->data[(nfrags-1) * PACKET_SIZE]), pkt->size - (nfrags-1)*PACKET_SIZE, nfrags);
 	}
 
-	void CaptureFrameListener::udp_send(int frame, int frag, char* pkt, int fragsize) {
+	void CaptureFrameListener::udp_send(int frame, int frag, char* pkt, int fragsize, int nfrags) {
 		struct sockaddr_in addr;
 
 		addr.sin_family = AF_INET;
@@ -276,6 +276,7 @@ namespace ve {
 		UDPPacket packet;
 		packet.header.nframe = frame;
 		packet.header.nfrag = frag;
+		packet.header.nfrags = nfrags;
 		memcpy_s(&packet.packet, PACKET_SIZE, pkt, fragsize);
 
 		printf("Sending packet %d.%d\n", packet.header.nframe, packet.header.nfrag);
