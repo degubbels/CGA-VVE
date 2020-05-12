@@ -17,9 +17,9 @@ namespace ve {
 
 	int nframe = 0;
 
-	const AVCodecID CODEC_ID = AV_CODEC_ID_VP9;
+	const AVCodecID CODEC_ID = AV_CODEC_ID_MPEG4;
 	const uint32_t BITRATE = 300'000;
-	const std::string name = "VP9_300";
+	const std::string name = "test_out";
 
 	/**
 	 *	Record every frame
@@ -39,7 +39,7 @@ namespace ve {
 
 		if (!prepared)
 		{
-			prepareCapture("out/"+name+".mpg", extent.width, extent.height);
+			prepareCapture("out/"+name+".mpg", 1280, 720);
 		}
 		
 
@@ -80,7 +80,7 @@ namespace ve {
 
 		avcodec_register_all();
 
-		codec = avcodec_find_encoder(AV_CODEC_ID_MPEG4);
+		codec = avcodec_find_encoder(CODEC_ID);
 		if (!codec) {
 			fprintf(stderr, "codec not found\n");
 			exit(1);
@@ -234,22 +234,41 @@ namespace ve {
 			}
 
 			printf("encoded frame %lld (size=%5d)\n", pkt->pts, pkt->size);
+
+			// Did I do this??
+			// If so WHY!?, what the fuck whats my ass-backwards shitpile of a brain thinking...
+			//avcodec_free_context(&codecContext);
+
 			prepare_send(pkt->pts, pkt);
 			av_packet_unref(pkt);
 		}
+
+
+
 	}
 
 	void CaptureFrameListener::prepare_send(int frame, AVPacket* pkt) {
-		int nfrags = (pkt->size / PACKET_SIZE) + 1;
+		int nfrags = (pkt->size / PACKET_SIZE) + 1;	
+
+		//printf("test %d, %X\n", frame, pkt->data[400]);
 		for (size_t i = 0; i < (nfrags-1); i++) {
 			
 			// Send fragment of packet starting at i*packet_size
-			udp_send(frame, i, reinterpret_cast<char*>(&pkt->data[i * PACKET_SIZE]), PACKET_SIZE, nfrags);
+			udp_send(frame, i, reinterpret_cast<char*>(&pkt->data[i * PACKET_SIZE]), PACKET_SIZE, nfrags, pkt->size);
 		}	
-		udp_send(frame, nfrags-1, reinterpret_cast<char*>(&pkt->data[(nfrags-1) * PACKET_SIZE]), pkt->size - (nfrags-1)*PACKET_SIZE, nfrags);
+		udp_send(frame, nfrags-1, reinterpret_cast<char*>(&pkt->data[(nfrags-1) * PACKET_SIZE]), pkt->size - (nfrags-1)*PACKET_SIZE, nfrags, pkt->size);
+
+		// Try writing
+		//fwrite(pkt->data, 1, pkt->size, outFile);
+
+		//// add sequence end code to have a real MPEG file
+		//uint8_t endcode[] = { 0, 0, 1, 0xb7 };
+		//fwrite(endcode, 1, sizeof(endcode), outFile);
+		//fclose(outFile);
+		//printf("testwrite done\n");
 	}
 
-	void CaptureFrameListener::udp_send(int frame, int frag, char* pkt, int fragsize, int nfrags) {
+	void CaptureFrameListener::udp_send(int frame, int frag, char* pkt, int fragsize, int nfrags, int framesize) {
 		struct sockaddr_in addr;
 
 		addr.sin_family = AF_INET;
@@ -277,7 +296,9 @@ namespace ve {
 		packet.header.nframe = frame;
 		packet.header.nfrag = frag;
 		packet.header.nfrags = nfrags;
+		packet.header.framesize = framesize;
 		memcpy_s(&packet.packet, PACKET_SIZE, pkt, fragsize);
+
 
 		printf("Sending packet %d.%d\n", packet.header.nframe, packet.header.nfrag);
 		int ret = sendto(sock, reinterpret_cast<char*>(&packet), sizeof(packet), 0, (const struct sockaddr*) & addr, sizeof(addr));
@@ -285,5 +306,7 @@ namespace ve {
 			printf("Send failure: %d\n", WSAGetLastError());
 			return;
 		}
+
+
 	}
 }

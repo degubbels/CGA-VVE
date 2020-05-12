@@ -15,12 +15,13 @@ namespace ve {
 		void encode_send(AVCodecContext* enc_ctx, AVFrame* frame, AVPacket* pkt);
 		void encode_frame(AVFrame* frame, VkExtent2D extent);
 		void prepare_send(int frame, AVPacket* pkt);
-		void udp_send(int frame, int frag, char pkt[1400], int fragsize, int nfrags);
+		void udp_send(int frame, int frag, char pkt[1400], int fragsize, int nfrags, int framesize);
 
 		struct UDPHeader {
 			uint32_t nframe;
 			uint32_t nfrag;
 			uint32_t nfrags;
+			uint32_t framesize;
 		};
 
 		struct UDPPacket {
