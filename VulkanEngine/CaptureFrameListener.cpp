@@ -3,6 +3,7 @@
 
 namespace ve {
 
+	// Have the codec and socket been initialized
 	bool prepared = false;
 
 	AVCodec* codec;
@@ -12,14 +13,16 @@ namespace ve {
 
 	FILE* outFile;
 
+	// Socket data
+	struct sockaddr_in addr;
+	WSADATA wsaData;
+	SOCKET sock;
+
 	int frames_since_last_capture = 0;
 	const int frames_between_captures = 3;
 
-	int nframe = 0;
-
 	const AVCodecID CODEC_ID = AV_CODEC_ID_MPEG4;
 	const uint32_t BITRATE = 300'000;
-	const std::string name = "test_out";
 
 	/**
 	 *	Record every frame
@@ -39,9 +42,9 @@ namespace ve {
 
 		if (!prepared)
 		{
-			prepareCapture("out/"+name+".mpg", 1280, 720);
+			prepareCapture(1280, 720);
+			prepareSocket();
 		}
-		
 
 		VkImage image = getRendererPointer()->getSwapChainImage();
 
@@ -64,13 +67,11 @@ namespace ve {
 		// Start encoding process
 		encode_frame(dst_picture, extent);
 
-		nframe++;
-
 		delete[] dataImage;
 	}
 
 	// Prepare capturing video to given filename
-	void CaptureFrameListener::prepareCapture(std::string filename, uint32_t width, uint32_t height) {
+	void CaptureFrameListener::prepareCapture(uint32_t width, uint32_t height) {
 		prepared = true;
 
 		outputExtent = {
@@ -102,17 +103,36 @@ namespace ve {
 		codecContext->gop_size = 10; // emit one intra frame every ten frames
 		codecContext->max_b_frames = 1;
 		codecContext->pix_fmt = AV_PIX_FMT_YUV420P;
-
-		// Open file
-		outFile = fopen(filename.c_str(), "wb");
-		if (!outFile) {
-			fprintf(stderr, "could not open %s\n", filename);
-			exit(1);
-		}
 	}
 
+	void CaptureFrameListener::prepareSocket() {
+
+		// Initialise winsock
+		printf("Initialising Winsock...");
+		if (WSAStartup(MAKEWORD(2, 2), &wsaData) != 0) {
+			printf("WSA init failed: %d\n", WSAGetLastError());
+			return;
+		}
+		printf("Initialised.\n");
+
+		// Socket definition
+		addr.sin_family = AF_INET;
+		addr.sin_addr.s_addr = inet_addr("127.0.0.1");
+		addr.sin_port = htons(8888);
+
+		// Initialize the socket
+		sock = socket(PF_INET, SOCK_DGRAM, 0);
+		if (sock < 0) {
+			printf("Socket init failed: %d\n", WSAGetLastError());
+			return;
+		}
+		printf("Socket created.\n");
+	}
+
+	// Flush encoder and release codec
 	void CaptureFrameListener::endCapture() {
 
+		// Create empty packet for flushing
 		AVPacket* pkt = av_packet_alloc();
 		if (!pkt) {
 			fprintf(stderr, "Cannot alloc packet\n");
@@ -120,18 +140,15 @@ namespace ve {
 		}
 
 		// flush the encoder
-		encode(codecContext, NULL, pkt, outFile);
-
-		// add sequence end code to have a real MPEG file
-		uint8_t endcode[] = { 0, 0, 1, 0xb7 };
-		fwrite(endcode, 1, sizeof(endcode), outFile);
-		fclose(outFile);
+		encode(codecContext, NULL, pkt);
 
 		avcodec_free_context(&codecContext);
 	}
 
 	// Convert dataImage and put into dst_picture
 	void CaptureFrameListener::convert_frame(uint8_t* dataImage, AVFrame* dst_picture, VkExtent2D extent) {
+
+		// Chekc frame exists
 		if (!dst_picture) {
 			fprintf(stderr, "video frame not allocated\n");
 			exit(5);
@@ -163,6 +180,7 @@ namespace ve {
 	// Encode single frame to file
 	void CaptureFrameListener::encode_frame(AVFrame* frame, VkExtent2D extent) {
 		
+		// Create av-packet
 		AVPacket* pkt = av_packet_alloc();
 		if (!pkt) {
 			fprintf(stderr, "Cannot alloc packet\n");
@@ -178,52 +196,27 @@ namespace ve {
 		}
 		
 		// Encode frame
-		encode_send(codecContext,
+		encode(codecContext,
 			picture,
 			pkt);
 		
+		// Release
 		av_packet_free(&pkt);
 		av_frame_free(&picture);
 	}
 
-	void CaptureFrameListener::encode(AVCodecContext* enc_ctx, AVFrame* frame, AVPacket* pkt, FILE* outfile)
-	{
-		int ret;
-
-		// send the frame to the encoder */
-		ret = avcodec_send_frame(enc_ctx, frame);
-		if (ret < 0) {
-			fprintf(stderr, "error sending a frame for encoding\n");
-			exit(1);
-		}
-
-		while (ret >= 0) {
-			int ret = avcodec_receive_packet(enc_ctx, pkt);
-			if (ret == AVERROR(EAGAIN) || ret == AVERROR_EOF)
-				return;
-			else if (ret < 0) {
-				fprintf(stderr, "error during encoding\n");
-				exit(1);
-			}
-
-			//printf("encoded frame %lld (size=%5d)\n", pkt->pts, pkt->size);
-			fwrite(pkt->data, 1, pkt->size, outfile);
-			av_packet_unref(pkt);
-		}
-	}
-
 	// Encode and send to udp
-	void CaptureFrameListener::encode_send(AVCodecContext* enc_ctx, AVFrame* frame, AVPacket* pkt)
-	{
+	void CaptureFrameListener::encode(AVCodecContext* enc_ctx, AVFrame* frame, AVPacket* pkt) {
 		int ret;
 
-		// send the frame to the encoder */
+		// send the frame to the encoder
 		ret = avcodec_send_frame(enc_ctx, frame);
 		if (ret < 0) {
 			fprintf(stderr, "error sending a frame for encoding\n");
 			exit(1);
 		}
 
+		// Get av-packets from frame
 		while (ret >= 0) {
 			int ret = avcodec_receive_packet(enc_ctx, pkt);
 			if (ret == AVERROR(EAGAIN) || ret == AVERROR_EOF)
@@ -235,63 +228,42 @@ namespace ve {
 
 			printf("encoded frame %lld (size=%5d)\n", pkt->pts, pkt->size);
 
-			// Did I do this??
-			// If so WHY!?, what the fuck whats my ass-backwards shitpile of a brain thinking...
-			//avcodec_free_context(&codecContext);
-
+			// Send av-packet
 			prepare_send(pkt->pts, pkt);
 			av_packet_unref(pkt);
 		}
-
-
-
 	}
 
+	// Divide send av-packets as multiple udp-packets (frags)
 	void CaptureFrameListener::prepare_send(int frame, AVPacket* pkt) {
+
 		int nfrags = (pkt->size / PACKET_SIZE) + 1;	
 
-		//printf("test %d, %X\n", frame, pkt->data[400]);
+		// Divide frame into packets and send them
 		for (size_t i = 0; i < (nfrags-1); i++) {
 			
 			// Send fragment of packet starting at i*packet_size
-			udp_send(frame, i, reinterpret_cast<char*>(&pkt->data[i * PACKET_SIZE]), PACKET_SIZE, nfrags, pkt->size);
-		}	
-		udp_send(frame, nfrags-1, reinterpret_cast<char*>(&pkt->data[(nfrags-1) * PACKET_SIZE]), pkt->size - (nfrags-1)*PACKET_SIZE, nfrags, pkt->size);
+			udp_send(
+				frame, i, 
+				reinterpret_cast<char*>(&pkt->data[i * PACKET_SIZE]), 
+				PACKET_SIZE, 
+				nfrags, pkt->size
+				);
+		}
 
-		// Try writing
-		//fwrite(pkt->data, 1, pkt->size, outFile);
-
-		//// add sequence end code to have a real MPEG file
-		//uint8_t endcode[] = { 0, 0, 1, 0xb7 };
-		//fwrite(endcode, 1, sizeof(endcode), outFile);
-		//fclose(outFile);
-		//printf("testwrite done\n");
+		// Last frag has different size
+		udp_send(
+			frame, nfrags-1,
+			reinterpret_cast<char*>(&pkt->data[(nfrags-1) * PACKET_SIZE]),
+			pkt->size - (nfrags-1)*PACKET_SIZE,
+			nfrags, pkt->size
+			);
 	}
 
+	// Send data fragment
 	void CaptureFrameListener::udp_send(int frame, int frag, char* pkt, int fragsize, int nfrags, int framesize) {
-		struct sockaddr_in addr;
-
-		addr.sin_family = AF_INET;
-		addr.sin_addr.s_addr = inet_addr("127.0.0.1");
-		addr.sin_port = htons(8888);
-
-		// Initialise winsock
-		WSADATA wsaData;
-		printf("\nInitialising Winsock...");
-		if (WSAStartup(MAKEWORD(2, 2), &wsaData) != 0) {
-			printf("WSA init failed: %d\n", WSAGetLastError());
-			return;
-		}
-		printf("Initialised.\n");
-
-		// Initialize the socket
-		int sock = socket(PF_INET, SOCK_DGRAM, 0);
-		if (sock < 0) {
-			printf("Socket init failed: %d\n", WSAGetLastError());
-			return;
-		}
-		printf("Socket created.\n");
-
+		
+		// Create packet object
 		UDPPacket packet;
 		packet.header.nframe = frame;
 		packet.header.nfrag = frag;
@@ -299,14 +271,21 @@ namespace ve {
 		packet.header.framesize = framesize;
 		memcpy_s(&packet.packet, PACKET_SIZE, pkt, fragsize);
 
-
 		printf("Sending packet %d.%d\n", packet.header.nframe, packet.header.nfrag);
-		int ret = sendto(sock, reinterpret_cast<char*>(&packet), sizeof(packet), 0, (const struct sockaddr*) & addr, sizeof(addr));
+
+		// Send packet
+		int ret = sendto(
+			sock, 
+			reinterpret_cast<char*>(&packet),
+			sizeof(packet),
+			0, 
+			(const struct sockaddr*) & addr,
+			sizeof(addr)
+			);
+
 		if (ret < 0) {
 			printf("Send failure: %d\n", WSAGetLastError());
 			return;
 		}
-
-
 	}
 }
