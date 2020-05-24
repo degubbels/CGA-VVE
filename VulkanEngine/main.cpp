@@ -313,7 +313,7 @@ int main() {
 	mve.run();
 
 	// Close video capture
-	captureFrameListener->endCapture();
+	//captureFrameListener->endCapture();
 
 	return 0;
 }

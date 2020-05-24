@@ -11,35 +11,48 @@ namespace ve {
 		struct nk_context* ctx = pSubrender->getContext();
 
 		// Draw test UI
+        if (nk_begin(ctx, "Scene Info", nk_rect(1000, 50, 240, 400),
+            NK_WINDOW_BORDER | NK_WINDOW_MOVABLE | NK_WINDOW_SCALABLE)) {
 
-        enum { EASY, HARD };
-        static int op = EASY;
-        static float value = 0.6f;
-        static int i = 20;
+            nk_layout_row_dynamic(ctx, 30, 1);
+            nk_labelf(ctx, NK_TEXT_LEFT, "Scene objects:");
 
-        if (nk_begin(ctx, "Show", nk_rect(50, 50, 220, 220),
-            NK_WINDOW_BORDER | NK_WINDOW_MOVABLE | NK_WINDOW_CLOSABLE)) {
-            /* fixed widget pixel width */
-            nk_layout_row_static(ctx, 30, 80, 1);
-            if (nk_button_label(ctx, "button")) {
-                /* event handling */
-            }
+			// Draw scene object tree
+			currtreenodeid = 0;
+			addToTree(getSceneManagerPointer()->getRootSceneNode(), ctx);
 
-            /* fixed widget window ratio width */
-            nk_layout_row_dynamic(ctx, 30, 2);
-            if (nk_option_label(ctx, "easy", op == EASY)) op = EASY;
-            if (nk_option_label(ctx, "hard", op == HARD)) op = HARD;
-
-            /* custom widget pixel width */
-            nk_layout_row_begin(ctx, NK_STATIC, 30, 2);
-            {
-                nk_layout_row_push(ctx, 50);
-                nk_label(ctx, "Volume:", NK_TEXT_LEFT);
-                nk_layout_row_push(ctx, 110);
-                nk_slider_float(ctx, 0, &value, 1.0f, 0.1f);
-            }
-            nk_layout_row_end(ctx);
+			// Select object info
+			if (nodeSelected) {
+				nk_labelf(ctx, NK_TEXT_LEFT, "Selected object:");
+				nk_labelf(ctx, NK_TEXT_LEFT, selectedNode->getName().c_str());
+			}
         }
-        nk_end(ctx);
+        nk_end(ctx);		
+	}
+
+	void SceneGUIListener::addToTree(VESceneNode* node, nk_context* ctx) {
+		if (nk_tree_push_id(ctx, NK_TREE_NODE,
+			node->getName().c_str(),
+			NK_MINIMIZED, currtreenodeid)) {
+
+			currtreenodeid++;
+
+			if (selectedNode == node) {
+				nk_label(ctx, "selected!", NK_TEXT_LEFT);
+			} else {
+				if (nk_button_label(ctx, "select")) {
+					selectedNode = node;
+					nodeSelected = true;
+				}
+			}
+
+			std::vector<VESceneNode*> children = node->getChildrenList();
+
+			for (int i = 0; i < children.size(); i++) {
+				addToTree(children[i], ctx);
+			}
+
+			nk_tree_pop(ctx);
+		}
 	}
 }
