@@ -42,6 +42,7 @@ extern "C"
 }
 
 #include "CaptureFrameListener.h"
+#include "SceneGUIListener.h"
 
 #include "KeyboardListener.h"
 

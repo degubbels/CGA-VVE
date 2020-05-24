@@ -213,7 +213,8 @@ namespace ve {
 
 			registerEventListener(new EventListenerCollision("Collision"), { veEvent::VE_EVENT_FRAME_STARTED });
 			registerEventListener(new EventListenerGUI("GUI"), { veEvent::VE_EVENT_DRAW_OVERLAY});
-			registerEventListener(captureFrameListener, { veEvent::VE_EVENT_FRAME_ENDED });
+			//registerEventListener(new CaptureFrameListener("captureListener"), { veEvent::VE_EVENT_FRAME_ENDED });
+			registerEventListener(new SceneGUIListener("SceneUI"), { veEvent::VE_EVENT_DRAW_OVERLAY });
 		};
 		
 
@@ -306,9 +307,6 @@ int main() {
 	bool debug = true;
 
 	MyVulkanEngine mve(debug);	//enable or disable debugging (=callback, validation layers)
-
-	captureFrameListener = new CaptureFrameListener("captureListener");
-	//captureFrameListener->prepareCapture("out/capture.mpg", 1920, 1080);
 
 	mve.initEngine();
 	mve.loadLevel(1);
