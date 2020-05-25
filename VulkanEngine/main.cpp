@@ -162,7 +162,7 @@ namespace ve {
 			}
 
 			for (int i = 0; i < NUM_CUBES; i++) {
-				glm::vec3 cubePos = getSceneManagerPointer()->getSceneNode("cube-" + i)->getPosition();
+				glm::vec3 cubePos = getSceneManagerPointer()->getSceneNode("cube-" + std::to_string(i))->getPosition();
 				float cubeDistance = glm::length(cubePos - catPos);
 
 				if (cubeDistance < 1.0f) {
@@ -287,7 +287,7 @@ namespace ve {
 			for (int i = 0; i < num; i++) {
 				VESceneNode *cube;
 
-				VECHECKPOINTER(cube = getSceneManagerPointer()->loadModel("cube-"+i, "media/models/test/crate0", "cube.obj", 0, parent));
+				VECHECKPOINTER(cube = getSceneManagerPointer()->loadModel("cube-"+std::to_string(i), "media/models/test/crate0", "cube.obj", 0, parent));
 
 				float xpos = (rand() % (int)(x_max - x_min)) + x_min;
 				float zpos = (rand() % (int)(z_max - z_min)) + z_min;
