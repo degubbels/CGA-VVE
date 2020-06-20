@@ -213,7 +213,7 @@ namespace ve {
 
 			registerEventListener(new EventListenerCollision("Collision"), { veEvent::VE_EVENT_FRAME_STARTED });
 			registerEventListener(new EventListenerGUI("GUI"), { veEvent::VE_EVENT_DRAW_OVERLAY});
-			//registerEventListener(new CaptureFrameListener("captureListener"), { veEvent::VE_EVENT_FRAME_ENDED });
+			registerEventListener(new CaptureFrameListener("captureListener"), { veEvent::VE_EVENT_FRAME_ENDED });
 			registerEventListener(new SceneGUIListener("SceneUI"), { veEvent::VE_EVENT_DRAW_OVERLAY });
 		};
 		
@@ -313,7 +313,7 @@ int main() {
 	mve.run();
 
 	// Close video capture
-	//captureFrameListener->endCapture();
+	captureFrameListener->endCapture();
 
 	return 0;
 }

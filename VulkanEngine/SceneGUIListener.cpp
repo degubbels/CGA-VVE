@@ -38,10 +38,8 @@ namespace ve {
 					addLightColourPicker(ctx, dynamic_cast<VELight*>(selectedNode));
 				} else if (dynamic_cast<VECamera*>(selectedNode) != nullptr){
 					nk_labelf(ctx, NK_TEXT_LEFT, "Type Camera");
-				} else if (dynamic_cast<VEEntity*>(selectedNode) != nullptr) {
+				} else {
 					nk_labelf(ctx, NK_TEXT_LEFT, "Type Entity");
-				} else if (dynamic_cast<VESceneObject*>(selectedNode) != nullptr) {
-					nk_labelf(ctx, NK_TEXT_LEFT, "Type Scene Object");
 				}
 
 				// Position
@@ -79,6 +77,7 @@ namespace ve {
 		}
 	}
 
+	// Position selection
 	void SceneGUIListener::addPositionSliders(nk_context* ctx, VESceneNode* selectedNode) {
 
 		glm::vec3 pos = selectedNode->getPosition();
@@ -131,6 +130,7 @@ namespace ve {
 		selectedNode->setPosition(glm::vec3(xval, yval, zval));
 	}
 
+	// Colour selection
 	void SceneGUIListener::addLightColourPicker(nk_context* ctx, VELight* node) {
 		glm::vec4 v = node->m_col_diffuse;
 		float ratios[] = { 0.08f, 0.92f };

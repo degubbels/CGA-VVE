@@ -22,7 +22,7 @@ namespace ve {
 	const int frames_between_captures = 3;
 
 	const AVCodecID CODEC_ID = AV_CODEC_ID_MPEG4;
-	const uint32_t BITRATE = 300'000;
+	const uint32_t BITRATE = 1'000'000;
 
 	/**
 	 *	Record every frame
