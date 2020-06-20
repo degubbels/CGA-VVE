@@ -162,7 +162,7 @@ namespace ve {
 			}
 
 			for (int i = 0; i < NUM_CUBES; i++) {
-				glm::vec3 cubePos = getSceneManagerPointer()->getSceneNode("cube-" + i)->getPosition();
+				glm::vec3 cubePos = getSceneManagerPointer()->getSceneNode("cube-" + std::to_string(i))->getPosition();
 				float cubeDistance = glm::length(cubePos - catPos);
 
 				if (cubeDistance < 1.0f) {
@@ -213,7 +213,8 @@ namespace ve {
 
 			registerEventListener(new EventListenerCollision("Collision"), { veEvent::VE_EVENT_FRAME_STARTED });
 			registerEventListener(new EventListenerGUI("GUI"), { veEvent::VE_EVENT_DRAW_OVERLAY});
-			registerEventListener(captureFrameListener, { veEvent::VE_EVENT_FRAME_ENDED });
+			//registerEventListener(new CaptureFrameListener("captureListener"), { veEvent::VE_EVENT_FRAME_ENDED });
+			registerEventListener(new SceneGUIListener("SceneUI"), { veEvent::VE_EVENT_DRAW_OVERLAY });
 		};
 		
 
@@ -286,7 +287,7 @@ namespace ve {
 			for (int i = 0; i < num; i++) {
 				VESceneNode *cube;
 
-				VECHECKPOINTER(cube = getSceneManagerPointer()->loadModel("cube-"+i, "media/models/test/crate0", "cube.obj", 0, parent));
+				VECHECKPOINTER(cube = getSceneManagerPointer()->loadModel("cube-"+std::to_string(i), "media/models/test/crate0", "cube.obj", 0, parent));
 
 				float xpos = (rand() % (int)(x_max - x_min)) + x_min;
 				float zpos = (rand() % (int)(z_max - z_min)) + z_min;
@@ -307,15 +308,12 @@ int main() {
 
 	MyVulkanEngine mve(debug);	//enable or disable debugging (=callback, validation layers)
 
-	captureFrameListener = new CaptureFrameListener("captureListener");
-	//captureFrameListener->prepareCapture("out/capture.mpg", 1920, 1080);
-
 	mve.initEngine();
 	mve.loadLevel(1);
 	mve.run();
 
 	// Close video capture
-	captureFrameListener->endCapture();
+	//captureFrameListener->endCapture();
 
 	return 0;
 }
