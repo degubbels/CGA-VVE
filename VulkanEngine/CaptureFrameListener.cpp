@@ -271,7 +271,9 @@ namespace ve {
 		packet.header.framesize = framesize;
 		memcpy_s(&packet.packet, PACKET_SIZE, pkt, fragsize);
 
-		//printf("Sending packet %d.%d\n", packet.header.nframe, packet.header.nfrag);
+		packet.gameinfo.currentTime = MVE::g_time;
+		packet.gameinfo.lost = MVE::g_gameLost;
+		packet.gameinfo.won = MVE::g_gameWon;
 
 		// Send packet
 		int ret = sendto(

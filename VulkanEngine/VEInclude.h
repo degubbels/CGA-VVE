@@ -8,7 +8,6 @@
 #ifndef VEINCLUDE_H
 #define VEINCLUDE_H
 
-
 #include "VHHelper.h"
 
 #include "VENamedClass.h"
@@ -47,6 +46,8 @@ extern "C"
 #include "KeyboardListener.h"
 
 #include "UserInputReceiver.h"
+
+#include "MyVulkanEngine.h"
 
 //use this macro to check the function result, if its not VK_SUCCESS then return the error
 #define VECHECKRESULT(x) { \

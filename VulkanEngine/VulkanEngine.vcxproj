@@ -176,6 +176,7 @@
     <ClInclude Include="CLShape.h" />
     <ClInclude Include="CaptureFrameListener.h" />
     <ClInclude Include="KeyboardListener.h" />
+    <ClInclude Include="MyVulkanEngine.h" />
     <ClInclude Include="SceneGUIListener.h" />
     <ClInclude Include="UserInputReceiver.h" />
     <ClInclude Include="VEEventListenerNuklear.h" />

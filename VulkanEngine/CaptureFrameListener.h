@@ -28,8 +28,15 @@ namespace ve {
 			uint32_t framesize;
 		};
 
+		struct UDPGameInfo {
+			float currentTime;
+			bool won;
+			bool lost;
+		};
+
 		struct UDPPacket {
 			UDPHeader header;
+			UDPGameInfo gameinfo;
 			char packet[PACKET_SIZE] = { 0 };
 		};
 
