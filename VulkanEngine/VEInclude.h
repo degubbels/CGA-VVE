@@ -46,6 +46,7 @@ extern "C"
 
 #include "KeyboardListener.h"
 
+#include "UserInputReceiver.h"
 
 //use this macro to check the function result, if its not VK_SUCCESS then return the error
 #define VECHECKRESULT(x) { \

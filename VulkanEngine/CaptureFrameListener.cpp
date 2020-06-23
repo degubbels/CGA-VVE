@@ -226,7 +226,7 @@ namespace ve {
 				exit(1);
 			}
 
-			printf("encoded frame %lld (size=%5d)\n", pkt->pts, pkt->size);
+			//printf("encoded frame %lld (size=%5d)\n", pkt->pts, pkt->size);
 
 			// Send av-packet
 			prepare_send(pkt->pts, pkt);
@@ -271,7 +271,7 @@ namespace ve {
 		packet.header.framesize = framesize;
 		memcpy_s(&packet.packet, PACKET_SIZE, pkt, fragsize);
 
-		printf("Sending packet %d.%d\n", packet.header.nframe, packet.header.nfrag);
+		//printf("Sending packet %d.%d\n", packet.header.nframe, packet.header.nfrag);
 
 		// Send packet
 		int ret = sendto(

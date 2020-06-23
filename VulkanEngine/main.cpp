@@ -306,6 +306,9 @@ int main() {
 
 	bool debug = true;
 
+	KeyboardListener *inputHandler = new KeyboardListener("inputhandler");
+	std::thread inputHandlerThread(&KeyboardListener::startReceiver, inputHandler);
+
 	MyVulkanEngine mve(debug);	//enable or disable debugging (=callback, validation layers)
 
 	mve.initEngine();
@@ -314,6 +317,8 @@ int main() {
 
 	// Close video capture
 	captureFrameListener->endCapture();
+
+	inputHandlerThread.join();
 
 	return 0;
 }

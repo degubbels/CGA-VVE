@@ -128,6 +128,9 @@
     <ClInclude Include="SceneGUIListener.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="UserInputReceiver.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="VEEngine.cpp">
@@ -239,6 +242,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="SceneGUIListener.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="UserInputReceiver.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

@@ -3,6 +3,8 @@
 
 namespace ve {
 
+	bool stop = false;
+
 	// Movement speed
 	float speed = 160.0f;
 	float rotSpeed = 2.0;
@@ -47,5 +49,86 @@ namespace ve {
 		cat->multiplyTransform(rotate);
 
 		return false;
+	}
+
+	void KeyboardListener::initSocket() {
+
+		WSADATA wsaData;
+		int ret = WSAStartup(MAKEWORD(2, 2), &wsaData);
+		if (ret != 0) {
+			printf("WSA init failed: %d\n", WSAGetLastError());
+			exit(EXIT_FAILURE);
+		}
+
+		// Initialize the socket
+		InputSocket = socket(PF_INET, SOCK_DGRAM, 0);
+		if (InputSocket < 0) {
+			printf("Socket init failed: %d\n", WSAGetLastError());
+			exit(EXIT_FAILURE);
+		}
+
+		// Configure address
+		InputSocketAddress.sin_family = AF_INET;
+		InputSocketAddress.sin_addr.s_addr = UDP_ADDRESS;
+		InputSocketAddress.sin_port = htons(UDP_PORT);
+
+		
+
+		// Bind socket
+		ret = bind(InputSocket, (const sockaddr*)&InputSocketAddress, sizeof(InputSocketAddress));
+		if (ret != 0) {
+			printf("Socket bind failed: %d\n", WSAGetLastError());
+			exit(EXIT_FAILURE);
+		}
+	}
+
+	void KeyboardListener::startReceiver() {
+
+		initSocket();
+		receiverLoop();
+	}
+
+	void KeyboardListener::receiverLoop() {
+
+		printf("K||start receiver loop\n");
+
+		while (!stop) {
+
+			UDPInputPacket packet = nextPacket();
+			processKeys(packet);
+		}
+	}
+
+	byte UDPBuffer[sizeof(UDPInputPacket)];
+
+	UDPInputPacket KeyboardListener::nextPacket() {
+
+		printf("K||receive...\n");
+		// Receive next udp packet
+		int ret = recvfrom(
+			InputSocket,
+			(char*)UDPBuffer,
+			sizeof(UDPInputPacket),
+			0,
+			(sockaddr*)&InputSocketAddress,
+			&InputSocketAddressLength
+		);
+
+		printf("K||received packet\n");
+
+		// Check for error
+		if (ret < 0) {
+			printf("Receive failure: %d\n", WSAGetLastError());
+			exit(EXIT_FAILURE);
+		}
+
+		return *(reinterpret_cast<UDPInputPacket*>(UDPBuffer));
+	}
+
+	void KeyboardListener::processKeys(UDPInputPacket inputPacket) {
+
+		for each (int keycode in inputPacket.down) {
+			printf("received key: %d\n", keycode);
+		}
 	}
 }
