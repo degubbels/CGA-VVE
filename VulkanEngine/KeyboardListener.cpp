@@ -180,6 +180,10 @@ namespace ve {
 					angle = rotSpeed * (float)dt * 1.0f;
 					rot4 = glm::vec4(0.0, 1.0, 0.0, 1.0);
 					break;
+				// Custom control codes
+				case 200:	// Start/restart
+					printf("restart\n");
+					//g_restart = true;
 				}
 
 			}

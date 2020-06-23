@@ -223,9 +223,9 @@ namespace ve {
 			VEEngine::registerEventListeners();
 
 			registerEventListener(new EventListenerCollision("Collision"), { veEvent::VE_EVENT_FRAME_STARTED });
-			registerEventListener(new EventListenerGUI("GUI"), { veEvent::VE_EVENT_DRAW_OVERLAY});
+			//registerEventListener(new EventListenerGUI("GUI"), { veEvent::VE_EVENT_DRAW_OVERLAY});
 			registerEventListener(new CaptureFrameListener("captureListener"), { veEvent::VE_EVENT_FRAME_ENDED });
-			registerEventListener(new SceneGUIListener("SceneUI"), { veEvent::VE_EVENT_DRAW_OVERLAY });
+			//registerEventListener(new SceneGUIListener("SceneUI"), { veEvent::VE_EVENT_DRAW_OVERLAY });
 		};
 		
 
