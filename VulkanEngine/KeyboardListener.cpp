@@ -12,6 +12,8 @@ namespace ve {
 	// Keys currently pressed
 	std::set<int> keysDown;
 
+	std::chrono::time_point<std::chrono::steady_clock> lastPacketTime;
+
 	/**
 	 *	Movement
 	 */
@@ -95,9 +97,16 @@ namespace ve {
 
 			UDPInputPacket packet = nextPacket();
 
-			updateKeysDown(packet);
-			processInput();
-			updateKeysUp(packet);
+			// update dt
+			auto currentPacketTime = std::chrono::high_resolution_clock::now();
+			std::chrono::duration<double> dt = currentPacketTime - lastPacketTime;
+			lastPacketTime = currentPacketTime;
+
+			if (!packet.empty) {
+				updateKeysDown(packet);
+				processInput(dt.count());
+				updateKeysUp(packet);
+			}
 		}
 	}
 
@@ -144,8 +153,8 @@ namespace ve {
 		}
 	}
 
-	void KeyboardListener::processInput() {
-		float dt = 0.3;
+	void KeyboardListener::processInput(double dt) {
+		printf("process with dt=%f\n", dt);
 
 		VESceneNode* catP = getSceneManagerPointer()->getSceneNode("catP");
 		VESceneNode* cat = getSceneManagerPointer()->getSceneNode("cat");

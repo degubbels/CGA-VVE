@@ -14,7 +14,7 @@ namespace ve {
 
 	float CAT_Y_OFFSET = 0.5;
 
-	int NUM_CUBES = 60;
+	int NUM_CUBES = 20;
 
 	float COURSE_LENGTH = 60.0;
 
@@ -136,7 +136,7 @@ namespace ve {
 				getSceneManagerPointer()->getSceneNode("catP")->setPosition(glm::vec3(0, 1.0f-CAT_Y_OFFSET, 0));
 
 				VESceneNode* pCameraParent = getSceneManagerPointer()->getCamera()->getParent();
-				pCameraParent->setPosition(glm::vec3(-10.0f, 10.0f, 0.0f));
+				pCameraParent->setPosition(glm::vec3(-20.0f, 25.0f, 0.0f));
 				getEnginePointer()->m_irrklangEngine->play2D("media/sounds/ophelia.mp3", true);
 				return;
 			}
@@ -227,9 +227,9 @@ namespace ve {
 			// Move camera up
 			VESceneNode* pCamera = getSceneManagerPointer()->getCamera();
 			VESceneNode* pCameraParent = pCamera->getParent();
-			pCameraParent->multiplyTransform(glm::translate(glm::mat4(1.0f), glm::vec3(-10.0f, 10.0f, 0.0f)));
+			pCameraParent->multiplyTransform(glm::translate(glm::mat4(1.0f), glm::vec3(-20.0f, 25.0f, 0.0f)));
 			pCamera->multiplyTransform(glm::rotate(glm::mat4(1.0), glm::half_pi<float>(), glm::vec3(0.0, 1.0, 0.0)));
-			pCamera->multiplyTransform(glm::rotate(glm::mat4(1.0), -glm::pi<float>() / 6, glm::vec3(0.0, 0.0, 1.0)));
+			pCamera->multiplyTransform(glm::rotate(glm::mat4(1.0), -glm::pi<float>() / 5.5f, glm::vec3(0.0, 0.0, 1.0)));
 
 			VESceneNode *pScene;
 			VECHECKPOINTER( pScene = getSceneManagerPointer()->createSceneNode("Level 1", getRoot()) );
