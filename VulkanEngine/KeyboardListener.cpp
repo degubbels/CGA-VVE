@@ -154,7 +154,6 @@ namespace ve {
 	}
 
 	void KeyboardListener::processInput(double dt) {
-		printf("process with dt=%f\n", dt);
 
 		VESceneNode* catP = getSceneManagerPointer()->getSceneNode("catP");
 		VESceneNode* cat = getSceneManagerPointer()->getSceneNode("cat");

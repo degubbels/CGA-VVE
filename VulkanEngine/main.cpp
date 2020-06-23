@@ -23,7 +23,10 @@ namespace ve {
 	float CUBES_Z_MIN = -12.0;
 	float CUBES_Z_MAX = 12.0;
 
-	double g_initialTime = 30.0;
+	float CUBES_WAVE_AMPLITUDE = 10;
+	float CUBES_WAVE_SPEED = 0.5;
+
+	double g_initialTime = 45.0;
 
 	uint32_t g_score = 0;				//derzeitiger Punktestand
 	double g_time = g_initialTime;				//zeit die noch übrig ist
@@ -161,8 +164,12 @@ namespace ve {
 				getEnginePointer()->m_irrklangEngine->play2D("media/sounds/bell.wav", false);
 			}
 
+			float elapsed_time = g_initialTime - g_time;
+			VESceneNode* cubeP = getSceneManagerPointer()->getSceneNode("The Cube Parent");
+
+			// Check for collision with cubes
 			for (int i = 0; i < NUM_CUBES; i++) {
-				glm::vec3 cubePos = getSceneManagerPointer()->getSceneNode("cube-" + std::to_string(i))->getPosition();
+				glm::vec3 cubePos = getSceneManagerPointer()->getSceneNode("cube-" + std::to_string(i))->getPosition() + cubeP->getPosition();
 				float cubeDistance = glm::length(cubePos - catPos);
 
 				if (cubeDistance < 1.0f) {
@@ -174,7 +181,11 @@ namespace ve {
 			}
 
 			g_time -= event.dt;
-					
+
+			// Move cubes
+			
+			cubeP->setPosition(glm::vec3(0.0f, 0.0f, CUBES_WAVE_AMPLITUDE * sin(elapsed_time * CUBES_WAVE_SPEED)));
+
 
 			// Player lost, End game
 			if (g_time <= 0) {

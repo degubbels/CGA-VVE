@@ -22,19 +22,19 @@ namespace ve {
 	const int frames_between_captures = 3;
 
 	const AVCodecID CODEC_ID = AV_CODEC_ID_MPEG4;
-	const uint32_t BITRATE = 1'000'000;
+	const uint32_t BITRATE = 500'000;
 
 	/**
 	 *	Record every frame
 	 */
 	void CaptureFrameListener::onFrameEnded(veEvent event) {
 		
-		if (frames_since_last_capture < frames_between_captures)
-		{
-			// Skip frame
-			frames_since_last_capture++;
-			return;
-		}
+		//if (frames_since_last_capture < frames_between_captures)
+		//{
+		//	// Skip frame
+		//	frames_since_last_capture++;
+		//	return;
+		//}
 
 		// Prepare frame capture
 		VkExtent2D extent = getWindowPointer()->getExtent();
