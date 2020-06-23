@@ -51,6 +51,7 @@ namespace ve {
 		return false;
 	}
 
+	// Initialise input receiver socket
 	void KeyboardListener::initSocket() {
 
 		WSADATA wsaData;
@@ -71,8 +72,6 @@ namespace ve {
 		InputSocketAddress.sin_family = AF_INET;
 		InputSocketAddress.sin_addr.s_addr = UDP_ADDRESS;
 		InputSocketAddress.sin_port = htons(UDP_PORT);
-
-		
 
 		// Bind socket
 		ret = bind(InputSocket, (const sockaddr*)&InputSocketAddress, sizeof(InputSocketAddress));
@@ -127,8 +126,45 @@ namespace ve {
 
 	void KeyboardListener::processKeys(UDPInputPacket inputPacket) {
 
+		float dt = 0.3;
+
+		VESceneNode* catP = getSceneManagerPointer()->getSceneNode("catP");
+		VESceneNode* cat = getSceneManagerPointer()->getSceneNode("cat");
+
+		glm::vec4 translate = glm::vec4(0.0, 0.0, 0.0, 1.0);	//total translation
+		glm::vec4 rot4 = glm::vec4(1.0);
+		float angle = 0.0;
+
 		for each (int keycode in inputPacket.down) {
-			printf("received key: %d\n", keycode);
+
+			if (keycode > 0) {
+				//printf("received key: %d\n", keycode);
+
+				switch (keycode) {
+				case 119: // W
+					translate = glm::translate(cat->getTransform(), glm::vec3(10.0f, 0.0f, 0.0f)) * glm::vec4(0.0, 0.0, 1.0, 1.0); //forward
+					translate.y = 0.0f;
+					break;
+				case 97: // A
+					angle = rotSpeed * (float)dt * -1.0f;
+					rot4 = glm::vec4(0.0, 1.0, 0.0, 1.0);
+					break;
+				case 100:
+					angle = rotSpeed * (float)dt * 1.0f;
+					rot4 = glm::vec4(0.0, 1.0, 0.0, 1.0);
+					break;
+				}
+
+			}
 		}
+
+		// Movement
+		glm::vec3 trans = speed * glm::vec3(translate.x, translate.y, translate.z);
+		catP->multiplyTransform(glm::translate(glm::mat4(1.0f), (float)dt * trans));
+
+		// Rotation
+		glm::vec3  rot3 = glm::vec3(rot4.x, rot4.y, rot4.z);
+		glm::mat4  rotate = glm::rotate(glm::mat4(1.0), angle, rot3);
+		cat->multiplyTransform(rotate);
 	}
 }
