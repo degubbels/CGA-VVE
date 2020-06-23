@@ -7,6 +7,7 @@ namespace ve {
 
 	struct UDPInputPacket {
 		int down[8];
+		int up[8];
 	};
 	class KeyboardListener : public VEEventListener {
 
@@ -24,7 +25,9 @@ namespace ve {
 		virtual UDPInputPacket KeyboardListener::nextPacket();
 
 		virtual void receiverLoop();
-		virtual void processKeys(UDPInputPacket);
+		virtual void updateKeysDown(UDPInputPacket);
+		virtual void updateKeysUp(UDPInputPacket);
+		virtual void processInput();
 
 	protected:
 

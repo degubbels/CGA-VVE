@@ -9,6 +9,8 @@ namespace ve {
 	float speed = 160.0f;
 	float rotSpeed = 2.0;
 
+	// Keys currently pressed
+	std::set<int> keysDown;
 
 	/**
 	 *	Movement
@@ -89,12 +91,13 @@ namespace ve {
 
 	void KeyboardListener::receiverLoop() {
 
-		printf("K||start receiver loop\n");
-
 		while (!stop) {
 
 			UDPInputPacket packet = nextPacket();
-			processKeys(packet);
+
+			updateKeysDown(packet);
+			processInput();
+			updateKeysUp(packet);
 		}
 	}
 
@@ -102,7 +105,6 @@ namespace ve {
 
 	UDPInputPacket KeyboardListener::nextPacket() {
 
-		printf("K||receive...\n");
 		// Receive next udp packet
 		int ret = recvfrom(
 			InputSocket,
@@ -113,8 +115,6 @@ namespace ve {
 			&InputSocketAddressLength
 		);
 
-		printf("K||received packet\n");
-
 		// Check for error
 		if (ret < 0) {
 			printf("Receive failure: %d\n", WSAGetLastError());
@@ -124,8 +124,27 @@ namespace ve {
 		return *(reinterpret_cast<UDPInputPacket*>(UDPBuffer));
 	}
 
-	void KeyboardListener::processKeys(UDPInputPacket inputPacket) {
+	void KeyboardListener::updateKeysDown(UDPInputPacket inputPacket) {
 
+		// Update keysDown set
+		for each (int keycode in inputPacket.down) {
+
+			if (keycode > 0) {
+				keysDown.insert(keycode);
+			}
+		}
+	}
+
+	void KeyboardListener::updateKeysUp(UDPInputPacket inputPacket) {
+		for each (int keycode in inputPacket.up) {
+
+			if (keycode > 0) {
+				keysDown.erase(keycode);
+			}
+		}
+	}
+
+	void KeyboardListener::processInput() {
 		float dt = 0.3;
 
 		VESceneNode* catP = getSceneManagerPointer()->getSceneNode("catP");
@@ -135,7 +154,7 @@ namespace ve {
 		glm::vec4 rot4 = glm::vec4(1.0);
 		float angle = 0.0;
 
-		for each (int keycode in inputPacket.down) {
+		for each (int keycode in keysDown) {
 
 			if (keycode > 0) {
 				//printf("received key: %d\n", keycode);
