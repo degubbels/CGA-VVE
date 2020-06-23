@@ -169,23 +169,34 @@ namespace ve {
 
 				switch (keycode) {
 				case 119: // W
-					translate = glm::translate(cat->getTransform(), glm::vec3(10.0f, 0.0f, 0.0f)) * glm::vec4(0.0, 0.0, 1.0, 1.0); //forward
-					translate.y = 0.0f;
+					if (!(MVE::g_preStart || MVE::g_gameWon || MVE::g_gameLost)) {
+						translate = glm::translate(cat->getTransform(), glm::vec3(10.0f, 0.0f, 0.0f)) * glm::vec4(0.0, 0.0, 1.0, 1.0); //forward
+						translate.y = 0.0f;
+					}
 					break;
 				case 97: // A
-					angle = rotSpeed * (float)dt * -1.0f;
-					rot4 = glm::vec4(0.0, 1.0, 0.0, 1.0);
+					if (!(MVE::g_preStart || MVE::g_gameWon || MVE::g_gameLost)) {
+						angle = rotSpeed * (float)dt * -1.0f;
+						rot4 = glm::vec4(0.0, 1.0, 0.0, 1.0);
+					}
 					break;
 				case 100:
-					angle = rotSpeed * (float)dt * 1.0f;
-					rot4 = glm::vec4(0.0, 1.0, 0.0, 1.0);
+					if (!(MVE::g_preStart || MVE::g_gameWon || MVE::g_gameLost)) {
+						angle = rotSpeed * (float)dt * 1.0f;
+						rot4 = glm::vec4(0.0, 1.0, 0.0, 1.0);
+					}
 					break;
-				// Custom control codes
-				case 200:	// Start/restart
-					printf("restart\n");
-					//g_restart = true;
-				}
+				case 13: // ENTER
 
+					// (re)start game if applicable
+					if (MVE::g_preStart || MVE::g_gameWon || MVE::g_gameLost) {
+						MVE::g_restart = true;
+					}
+					break;
+				default:
+					printf("key: %d\n", keycode);
+					break;
+				}
 			}
 		}
 

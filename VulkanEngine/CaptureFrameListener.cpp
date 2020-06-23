@@ -272,6 +272,7 @@ namespace ve {
 		memcpy_s(&packet.packet, PACKET_SIZE, pkt, fragsize);
 
 		packet.gameinfo.currentTime = MVE::g_time;
+		packet.gameinfo.prestart = MVE::g_preStart;
 		packet.gameinfo.lost = MVE::g_gameLost;
 		packet.gameinfo.won = MVE::g_gameWon;
 

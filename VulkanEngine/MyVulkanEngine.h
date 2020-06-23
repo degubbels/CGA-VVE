@@ -12,6 +12,7 @@ namespace ve {
 		static double g_initialTime;
 		static double g_time;				//zeit die noch übrig ist
 
+		static bool g_preStart;
 		static bool g_gameWon;
 		static bool g_gameLost;			//true... das Spiel wurde verloren
 		static bool g_restart;				//true...das Spiel soll neu gestartet werden

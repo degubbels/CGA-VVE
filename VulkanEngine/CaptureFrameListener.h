@@ -30,6 +30,7 @@ namespace ve {
 
 		struct UDPGameInfo {
 			float currentTime;
+			bool prestart;
 			bool won;
 			bool lost;
 		};

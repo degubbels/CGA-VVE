@@ -29,6 +29,7 @@ namespace ve {
 	double MVE::g_initialTime = 45.0;
 	double MVE::g_time = g_initialTime;				//zeit die noch übrig ist
 
+	bool MVE::g_preStart = true;
 	bool MVE::g_gameWon = false;
 	bool MVE::g_gameLost = false;			//true... das Spiel wurde verloren
 	bool MVE::g_restart = false;				//true...das Spiel soll neu gestartet werden
@@ -127,6 +128,7 @@ namespace ve {
 
 			// Reset game
 			if (MVE::g_restart) {
+				MVE::g_preStart = false;
 				MVE::g_gameWon = false;
 				MVE::g_gameLost = false;
 				MVE::g_restart = false;
@@ -141,7 +143,7 @@ namespace ve {
 			}
 
 			// Do nothing if the game is over
-			if (MVE::g_gameLost || MVE::g_gameWon) return;
+			if (MVE::g_gameLost || MVE::g_gameWon || MVE::g_preStart) return;
 
 			glm::vec3 catPos = getSceneManagerPointer()->getSceneNode("catP")->getPosition();
 
