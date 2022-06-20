@@ -8,7 +8,6 @@
 #ifndef VEINCLUDE_H
 #define VEINCLUDE_H
 
-
 #include "VHHelper.h"
 
 #include "VENamedClass.h"
@@ -33,6 +32,22 @@
 #include "VERenderer.h"
 #include "VERendererForward.h"
 
+extern "C"
+{
+#include <libswscale/swscale.h>
+#include <libavutil/frame.h>
+#include "libavutil/imgutils.h"
+#include "libavcodec/avcodec.h"
+}
+
+#include "CaptureFrameListener.h"
+#include "SceneGUIListener.h"
+
+#include "KeyboardListener.h"
+
+#include "UserInputReceiver.h"
+
+#include "MyVulkanEngine.h"
 
 //use this macro to check the function result, if its not VK_SUCCESS then return the error
 #define VECHECKRESULT(x) { \

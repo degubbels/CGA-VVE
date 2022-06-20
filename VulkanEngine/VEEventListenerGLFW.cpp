@@ -43,17 +43,17 @@ namespace ve {
 		VESceneNode *pParent = pCamera->getParent();
 
 		switch (event.idata1) {
-		case GLFW_KEY_A:
+		case GLFW_KEY_J:
 			translate = pCamera->getTransform() * glm::vec4(-1.0, 0.0, 0.0, 1.0);	//left
 			break;
-		case GLFW_KEY_D:
+		case GLFW_KEY_L:
 			translate = pCamera->getTransform() * glm::vec4(1.0, 0.0, 0.0, 1.0); //right
 			break;
-		case GLFW_KEY_W:
+		case GLFW_KEY_I:
 			translate = pCamera->getTransform() * glm::vec4(0.0, 0.0, 1.0, 1.0); //forward
 			translate.y = 0.0f;
 			break;
-		case GLFW_KEY_S:
+		case GLFW_KEY_K:
 			translate = pCamera->getTransform() * glm::vec4(0.0, 0.0, -1.0, 1.0); //back
 			translate.y = 0.0f;
 			break;
